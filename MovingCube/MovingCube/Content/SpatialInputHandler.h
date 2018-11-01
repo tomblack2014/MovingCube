@@ -26,5 +26,9 @@ namespace MovingCube
 
         // Used to indicate that a Pressed input event was received this frame.
         Windows::UI::Input::Spatial::SpatialInteractionSourceState^ m_sourceState = nullptr;
+		void OnSourceUpdated(
+			Windows::UI::Input::Spatial::SpatialInteractionManager^ sender,
+			Windows::UI::Input::Spatial::SpatialInteractionSourceEventArgs^ args);
+		Windows::Foundation::EventRegistrationToken m_sourceUpdatedEventToken;
     };
 }

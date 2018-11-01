@@ -6,7 +6,7 @@
 #include <Collection.h>
 
 #include "ModelData.h"
-
+#include "Client.h"
 
 using namespace MovingCube;
 
@@ -26,6 +26,8 @@ MovingCubeMain::MovingCubeMain(const std::shared_ptr<DX::DeviceResources>& devic
 {
 	// Register to be notified if the device is lost or recreated.
 	m_deviceResources->RegisterDeviceNotify(this);
+
+	m_client.Connect();
 }
 
 void MovingCubeMain::SetHolographicSpace(HolographicSpace^ holographicSpace)
@@ -40,21 +42,21 @@ void MovingCubeMain::SetHolographicSpace(HolographicSpace^ holographicSpace)
 
 #ifdef DRAW_SAMPLE_CONTENT
 	// Initialize the sample hologram.
-	for (int i = 0; i < 2; i++) {
+	/*for (int i = 0; i < 1; i++) {
 		auto m_spinningCubeRenderer = std::make_shared<SpinningCubeRenderer>(m_deviceResources);
 		m_spinningCubeRenderer->SetPosition(float3(i, 0, -2));
-		
+
 		m_spinningCubeRenderer->SetV_I(cubeVertices, cubeIndices);
 		m_objRenderers.push_back(m_spinningCubeRenderer);
-	}
+	}*/
 
-	for (int i = 0; i < 2; i++) {
+	/*for (int i = 0; i < 2; i++) {
 		auto m_spinningCubeRenderer = std::make_shared<SpinningCubeRenderer>(m_deviceResources);
 		m_spinningCubeRenderer->SetPosition(float3(i, 0.5, -2));
-		
+
 		m_spinningCubeRenderer->SetV_I(pyramidVertices, pyramidIndices);
 		m_objRenderers.push_back(m_spinningCubeRenderer);
-	}
+	}*/
 
 	m_spatialInputHandler = std::make_unique<SpatialInputHandler>();
 #endif
@@ -174,7 +176,6 @@ HolographicFrame^ MovingCubeMain::Update()
 	SpatialInteractionSourceState^ pointerState = m_spatialInputHandler->CheckForInput();
 	if (pointerState != nullptr)
 	{
-
 		// When a Pressed gesture is detected, the sample hologram will be repositioned
 		// two meters in front of the user.
 		for (auto& i : m_objRenderers) {
@@ -184,6 +185,36 @@ HolographicFrame^ MovingCubeMain::Update()
 		}
 	}
 #endif
+
+	int num = 0;
+	for (auto& i : m_objRenderers) {
+		Windows::Foundation::Numerics::float3 upData;
+		if (i->GetNewPos(upData)) {
+			m_client.SetUploadData(upData, num);
+		}
+		num++;
+	}
+
+	std::list<Windows::Foundation::Numerics::float3> data;
+	if (m_client.AskData(data) && data.size() > 0) {
+		auto it = m_objRenderers.begin();
+		auto it2 = data.begin();
+		for (; it2 != data.end(); it2++) {
+			if (it == m_objRenderers.end()) {
+				auto m_spinningCubeRenderer = std::make_shared<SpinningCubeRenderer>(m_deviceResources);
+				m_spinningCubeRenderer->SetPosition(*it2);
+
+				m_spinningCubeRenderer->SetV_I(cubeVertices, cubeIndices);
+				m_objRenderers.push_back(m_spinningCubeRenderer);
+			}
+			else {
+				if ((*it)->GetStat() == 0)
+					(*it)->SetPosition(*it2);
+				it++;
+			}
+			
+		}
+	}
 
 	m_timer.Tick([&]()
 	{
@@ -226,6 +257,8 @@ HolographicFrame^ MovingCubeMain::Update()
 		);
 #endif
 	}
+
+	
 
 	// The holographic frame will be used to get up-to-date view and projection matrices and
 	// to present the swap chain.

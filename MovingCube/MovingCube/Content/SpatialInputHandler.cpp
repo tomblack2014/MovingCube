@@ -22,6 +22,12 @@ SpatialInputHandler::SpatialInputHandler()
                 bind(&SpatialInputHandler::OnSourcePressed, this, _1, _2)
                 );
 
+	/*m_sourceUpdatedEventToken =
+		m_interactionManager->SourceUpdated +=
+		ref new TypedEventHandler<SpatialInteractionManager^, SpatialInteractionSourceEventArgs^>(
+			bind(&SpatialInputHandler::OnSourceUpdated, this, _1, _2)
+			);*/
+
     //
     // TODO: Expand this class to use other gesture-based input events as applicable to
     //       your app.
@@ -52,4 +58,23 @@ void SpatialInputHandler::OnSourcePressed(SpatialInteractionManager^ sender, Spa
     // TODO: In your app or game engine, rewrite this method to queue
     //       input events in your input class or event handler.
     //
+}
+
+void SpatialInputHandler::OnSourceUpdated(SpatialInteractionManager^ sender, SpatialInteractionSourceEventArgs^ args)
+{
+	//m_sourceState = args->State;
+	if (args->State->Source->IsGraspSupported)
+	{
+		if (args->State->IsGrasped)
+		{
+			m_sourceState = args->State;
+		}
+	}
+	else
+	{
+		if (args->State->IsSelectPressed)
+		{
+			m_sourceState = args->State;
+		}
+	}
 }

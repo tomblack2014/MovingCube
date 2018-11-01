@@ -4,6 +4,7 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap2="http://schemas.microsoft.com/appx/manifest/uap/windows10/2"
   IgnorableNamespaces="uap mp">
 
   <Identity Name="78d5fc70-9735-4638-a19e-99794b909aad"
@@ -41,4 +42,8 @@
         </uap:VisualElements>
       </Application>
   </Applications>
+  
+  <Capabilities>
+    <Capability Name="internetClient" />
+  </Capabilities>
 </Package>

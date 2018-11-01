@@ -13,6 +13,8 @@ SpinningCubeRenderer::SpinningCubeRenderer(const std::shared_ptr<DX::DeviceResou
 	m_deviceResources(deviceResources)
 {
 	CreateDeviceDependentResources();
+
+	m_isNewPos = false;
 }
 
 // This function uses a SpatialPointerPose to position the world-locked hologram
@@ -49,6 +51,17 @@ void SpinningCubeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
 	return;
 }
 
+bool SpinningCubeRenderer::GetNewPos(Windows::Foundation::Numerics::float3& newPos)
+{
+	if (m_isNewPos) {
+		newPos = m_newPos; 
+		m_isNewPos = false;
+		return true;
+	}
+
+	return false;
+}
+
 // Called once per frame. Rotates the cube, and calculates and sets the model matrix
 // relative to the position transform indicated by hologramPositionTransform.
 void SpinningCubeRenderer::Update(const DX::StepTimer& timer)
@@ -82,6 +95,8 @@ void SpinningCubeRenderer::Update(const DX::StepTimer& timer)
 				SetPosition(m_targetPos);
 				m_moveStat = 0;
 				m_moveTime = -0.1;
+				m_newPos = m_targetPos;
+				m_isNewPos = true;
 			}
 			else {
 				SetPosition(position + vec * moveDis / dis);

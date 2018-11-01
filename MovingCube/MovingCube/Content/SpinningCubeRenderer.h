@@ -23,6 +23,12 @@ namespace MovingCube
 		//Windows::Foundation::Numerics::float3 GetPosition()         { return m_position; }
 		void SetV_I(const std::vector<VertexPositionColor>& vertics, const std::vector<unsigned short>& indices) { m_vertices = vertics; m_indices = indices; };
 
+		bool GetNewPos(Windows::Foundation::Numerics::float3& newPos); 
+
+		void UpdatePos(Windows::Foundation::Numerics::float3& pos) { if (m_moveStat == 0) SetPosition(pos); };
+
+		int GetStat() { return m_moveStat; };
+
     private:
         // Cached pointer to device resources.
         std::shared_ptr<DX::DeviceResources>            m_deviceResources;
@@ -57,5 +63,9 @@ namespace MovingCube
 		//model data
 		std::vector<VertexPositionColor>				m_vertices;
 		std::vector<unsigned short>						m_indices;
+
+		//upload data
+		Windows::Foundation::Numerics::float3			m_newPos;
+		bool											m_isNewPos;
     };
 }

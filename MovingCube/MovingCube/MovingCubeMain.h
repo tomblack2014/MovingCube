@@ -19,6 +19,7 @@
 #endif
 
 #include <list>
+#include "Client.h"
 
 // Updates, renders, and presents holographic content using Direct3D.
 namespace MovingCube
@@ -97,5 +98,8 @@ namespace MovingCube
 		Windows::Foundation::EventRegistrationToken                     m_cameraAddedToken;
 		Windows::Foundation::EventRegistrationToken                     m_cameraRemovedToken;
 		Windows::Foundation::EventRegistrationToken                     m_locatabilityChangedToken;
+
+	private:
+		Client m_client;
 	};
 }

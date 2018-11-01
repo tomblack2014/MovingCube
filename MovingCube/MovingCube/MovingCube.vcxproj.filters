@@ -65,6 +65,12 @@
     </ClCompile>
     <ClCompile Include="MovingCubeMain.cpp" />
     <ClCompile Include="Content\MovableObject.cpp" />
+    <ClCompile Include="HoloClient.cpp">
+      <Filter>Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>Content</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -81,6 +87,15 @@
     <ClInclude Include="MovingCubeMain.h" />
     <ClInclude Include="Content\MovableObject.h" />
     <ClInclude Include="ModelData.h" />
+    <ClInclude Include="NetCtrlor.h">
+      <Filter>Content</Filter>
+    </ClInclude>
+    <ClInclude Include="HoloClient.h">
+      <Filter>Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.h">
+      <Filter>Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Content\VertexShader.hlsl">
