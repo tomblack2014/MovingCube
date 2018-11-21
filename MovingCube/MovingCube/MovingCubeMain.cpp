@@ -7,6 +7,7 @@
 
 #include "ModelData.h"
 #include "Client.h"
+#include "NamedObj.h"
 
 using namespace MovingCube;
 
@@ -22,7 +23,8 @@ using namespace DirectX;
 
 // Loads and initializes application assets when the application is loaded.
 MovingCubeMain::MovingCubeMain(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
-	m_deviceResources(deviceResources)
+	m_deviceResources(deviceResources),
+	m_factory(deviceResources)
 {
 	// Register to be notified if the device is lost or recreated.
 	m_deviceResources->RegisterDeviceNotify(this);
@@ -188,16 +190,42 @@ HolographicFrame^ MovingCubeMain::Update()
 
 	int num = 0;
 	for (auto& i : m_objRenderers) {
-		Windows::Foundation::Numerics::float3 upData;
-		if (i->GetNewPos(upData)) {
-			m_client.SetUploadData(upData, num);
+		if (i->GetNewPos()) {
+			char* dataPtr;
+			int size = m_objRenderers[0]->Pack(&dataPtr);
+			std::vector<char>data(size);
+			memcpy_s(data.data(), size, dataPtr, size);
+			m_client.SetUploadData(data);
+			if (dataPtr)
+				delete dataPtr;
+			break;
 		}
 		num++;
 	}
 
-	std::list<Windows::Foundation::Numerics::float3> data;
+	std::vector<char> data;
 	if (m_client.AskData(data) && data.size() > 0) {
-		auto it = m_objRenderers.begin();
+		auto res = NamedObj::UnPack(data.size(), data.data(), &m_factory, m_objRenderers);
+		//auto nodes = res->GetAllNodes();
+
+		/*auto it = m_objRenderers.begin();
+		auto it2 = nodes.begin();
+		for (; it2 != nodes.end(); it2++) {
+			if (it == m_objRenderers.end()) {
+				auto m_spinningCubeRenderer = std::make_shared<SpinningCubeRenderer>(m_deviceResources, (*it2)->GetName());
+				m_spinningCubeRenderer->SetPosition((*it2)->GetPosition());
+
+				m_spinningCubeRenderer->SetV_I(cubeVertices, cubeIndices);
+				m_objRenderers.push_back(m_spinningCubeRenderer);
+			}
+			else {
+				if ((*it)->GetStat() == 0)
+					(*it)->SetPosition((*it2)->GetPosition());
+				it++;
+			}
+		}*/
+
+		/*auto it = m_objRenderers.begin();
 		auto it2 = data.begin();
 		for (; it2 != data.end(); it2++) {
 			if (it == m_objRenderers.end()) {
@@ -213,7 +241,7 @@ HolographicFrame^ MovingCubeMain::Update()
 				it++;
 			}
 			
-		}
+		}*/
 	}
 
 	m_timer.Tick([&]()

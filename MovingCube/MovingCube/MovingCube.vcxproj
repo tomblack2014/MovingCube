@@ -104,6 +104,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(IntermediateOutputPath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -147,6 +148,10 @@
     <ClInclude Include="AppView.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Content\MovableObject.h" />
+    <ClInclude Include="Cube.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="Root.h" />
+    <ClInclude Include="SimpleFactory.h" />
     <ClInclude Include="HoloClient.h" />
     <ClInclude Include="ModelData.h" />
     <ClInclude Include="MovingCubeMain.h" />
@@ -157,7 +162,9 @@
     <ClInclude Include="Content\SpatialInputHandler.h" />
     <ClInclude Include="Content\ShaderStructures.h" />
     <ClInclude Include="Content\SpinningCubeRenderer.h" />
+    <ClInclude Include="NamedObj.h" />
     <ClInclude Include="NetCtrlor.h" />
+    <ClInclude Include="ObjectIntf.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -165,14 +172,18 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="Content\MovableObject.cpp" />
     <ClCompile Include="HoloClient.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="MovingCubeMain.cpp" />
     <ClCompile Include="Common\DeviceResources.cpp" />
     <ClCompile Include="Common\CameraResources.cpp" />
     <ClCompile Include="Content\SpatialInputHandler.cpp" />
     <ClCompile Include="Content\SpinningCubeRenderer.cpp" />
+    <ClCompile Include="NamedObj.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Root.cpp" />
+    <ClCompile Include="SimpleFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

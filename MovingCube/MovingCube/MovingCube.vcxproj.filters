@@ -71,6 +71,18 @@
     <ClCompile Include="Client.cpp">
       <Filter>Content</Filter>
     </ClCompile>
+    <ClCompile Include="NamedObj.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleFactory.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Content</Filter>
+    </ClCompile>
+    <ClCompile Include="Root.cpp">
+      <Filter>Content</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -94,6 +106,24 @@
       <Filter>Content</Filter>
     </ClInclude>
     <ClInclude Include="Client.h">
+      <Filter>Content</Filter>
+    </ClInclude>
+    <ClInclude Include="NamedObj.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectIntf.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleFactory.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Content</Filter>
+    </ClInclude>
+    <ClInclude Include="Root.h">
       <Filter>Content</Filter>
     </ClInclude>
   </ItemGroup>

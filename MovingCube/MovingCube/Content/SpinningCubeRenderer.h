@@ -1,15 +1,17 @@
 #pragma once
 
-#include "MovableObject.h"
+#include "NamedObj.h"
+#include "Model.h"
 #include <vector>
 
 namespace MovingCube
 {
     // This sample renderer instantiates a basic rendering pipeline.
-    class SpinningCubeRenderer : public MovableObject
+    class SpinningCubeRenderer : public NamedObj
     {
     public:
         SpinningCubeRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources);
+		SpinningCubeRenderer(SpinningCubeRenderer&);
         void CreateDeviceDependentResources() override;
         void ReleaseDeviceDependentResources() override;
         void Update(const DX::StepTimer& timer) override;
@@ -23,13 +25,28 @@ namespace MovingCube
 		//Windows::Foundation::Numerics::float3 GetPosition()         { return m_position; }
 		void SetV_I(const std::vector<VertexPositionColor>& vertics, const std::vector<unsigned short>& indices) { m_vertices = vertics; m_indices = indices; };
 
-		bool GetNewPos(Windows::Foundation::Numerics::float3& newPos); 
+		void SetModel(const std::shared_ptr<Model>& model) { m_vertices = model->GetVertices(); m_indices = model->GetIndices(); };
+
+		bool GetNewPos() override;
 
 		void UpdatePos(Windows::Foundation::Numerics::float3& pos) { if (m_moveStat == 0) SetPosition(pos); };
 
-		int GetStat() { return m_moveStat; };
+		int GetStat() override { return m_moveStat; };
+
+		void CalMyBytes() override;
+
+		void UpdateData(const std::vector<char>& data) override;
+
+	protected:
+		std::vector<char> GetDataBytes() override;
+
+		int GetType() override { return 1; };
+
+		void UpdateBinding(std::shared_ptr<NamedObj> root) override;
 
     private:
+		void SetGlobalPos(Windows::Foundation::Numerics::float3 pos) { if (m_parent) SetPosition(pos - m_parent->GetGlobalPos()); else SetPosition(pos); };
+
         // Cached pointer to device resources.
         std::shared_ptr<DX::DeviceResources>            m_deviceResources;
 
@@ -63,6 +80,8 @@ namespace MovingCube
 		//model data
 		std::vector<VertexPositionColor>				m_vertices;
 		std::vector<unsigned short>						m_indices;
+		int												m_modelID;
+		int												m_lastModelID;
 
 		//upload data
 		Windows::Foundation::Numerics::float3			m_newPos;

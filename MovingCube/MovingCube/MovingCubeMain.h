@@ -20,6 +20,7 @@
 
 #include <list>
 #include "Client.h"
+#include "SimpleFactory.h"
 
 // Updates, renders, and presents holographic content using Direct3D.
 namespace MovingCube
@@ -73,7 +74,7 @@ namespace MovingCube
 		// Renders a colorful holographic cube that's 20 centimeters wide. This sample content
 		// is used to demonstrate world-locked rendering.
 
-		std::list<std::shared_ptr<SpinningCubeRenderer>>				m_objRenderers;
+		std::vector<std::shared_ptr<NamedObj>>				m_objRenderers;
 
 		// Listens for the Pressed spatial input event.
 		std::shared_ptr<SpatialInputHandler>                            m_spatialInputHandler;
@@ -101,5 +102,7 @@ namespace MovingCube
 
 	private:
 		Client m_client;
+
+		SimpleFactory m_factory;
 	};
 }

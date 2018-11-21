@@ -10,14 +10,20 @@ namespace MovingCube
 	class MovableObject
 	{
 	public:
+		~MovableObject() {};
+
 		//interface
-		virtual void CreateDeviceDependentResources() PURE;
-		virtual void ReleaseDeviceDependentResources() PURE;
-		virtual void Update(const DX::StepTimer& timer) PURE;
-		virtual void Render() PURE;
+		virtual void CreateDeviceDependentResources() {};
+		virtual void ReleaseDeviceDependentResources() {};
+		virtual void Update(const DX::StepTimer& timer) {};
+		virtual void Render() {};
 
 		// Repositions the sample hologram.
-		virtual void PositionHologram(Windows::UI::Input::Spatial::SpatialPointerPose^ pointerPose) PURE;
+		virtual void PositionHologram(Windows::UI::Input::Spatial::SpatialPointerPose^ pointerPose) {};
+
+		virtual bool GetNewPos() { return false; };
+
+		virtual int GetStat() { return 0; };
 
 		// Property accessors.
 		void SetPosition(Windows::Foundation::Numerics::float3 pos) { m_position = pos; }

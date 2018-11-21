@@ -2,6 +2,7 @@
 
 #include <list>
 #include <WinSock2.h>
+#include <vector>
 
 class Client
 {
@@ -13,9 +14,9 @@ public:
 
 	void Connect();
 
-	bool AskData(std::list<Windows::Foundation::Numerics::float3>&);
+	bool AskData(std::vector<char>& data);
 
-	void SetUploadData(Windows::Foundation::Numerics::float3 data, int num);
+	void SetUploadData(std::vector<char> data);
 
 private:
 	SOCKET m_socket;

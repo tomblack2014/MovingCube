@@ -1,6 +1,10 @@
 #include "pch.h"
 #include "SpinningCubeRenderer.h"
 #include "Common\DirectXHelper.h"
+#include "ModelData.h"
+
+#include <memory>
+
 
 using namespace MovingCube;
 using namespace Concurrency;
@@ -12,10 +16,22 @@ using namespace Windows::UI::Input::Spatial;
 SpinningCubeRenderer::SpinningCubeRenderer(const std::shared_ptr<DX::DeviceResources>& deviceResources) :
 	m_deviceResources(deviceResources)
 {
-	CreateDeviceDependentResources();
+	//CreateDeviceDependentResources();
 
 	m_isNewPos = false;
+
+	//m_indices = cubeIndices;
+	//m_vertices = cubeVertices;
+
+	m_lastModelID = -1;
+	m_modelID = 0;
 }
+
+SpinningCubeRenderer::SpinningCubeRenderer(SpinningCubeRenderer& other)
+{
+
+}
+
 
 // This function uses a SpatialPointerPose to position the world-locked hologram
 // two meters in front of the user's heading.
@@ -24,7 +40,7 @@ void SpinningCubeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
 	//if head->cube | headDirection angle < 10 degree then means it's gazed
 	const float3 headPosition = pointerPose->Head->Position;
 	const float3 headDirection = pointerPose->Head->ForwardDirection;
-	float3 head2cube = GetPosition() - headPosition;
+	float3 head2cube = GetGlobalPos() - headPosition;
 
 	if (m_moveStat == 0) {
 		auto dot = [](float3 v1, float3 v2)->float {
@@ -51,10 +67,9 @@ void SpinningCubeRenderer::PositionHologram(SpatialPointerPose^ pointerPose)
 	return;
 }
 
-bool SpinningCubeRenderer::GetNewPos(Windows::Foundation::Numerics::float3& newPos)
+bool SpinningCubeRenderer::GetNewPos()
 {
 	if (m_isNewPos) {
-		newPos = m_newPos; 
 		m_isNewPos = false;
 		return true;
 	}
@@ -85,27 +100,29 @@ void SpinningCubeRenderer::Update(const DX::StepTimer& timer)
 			const float moveSpeed = 0.3f;
 			double time = timer.GetTotalSeconds() - m_moveTime;
 			m_moveTime += time;
-			auto position = GetPosition();
+			auto position = GetGlobalPos();
 
 			//calculate distance
 			float3 vec = m_targetPos - position;
 			double dis = sqrtf((vec.x) * (vec.x) + (vec.y) * (vec.y) + (vec.z) * (vec.z));
 			double moveDis = moveSpeed * time;
 			if (dis < moveDis) {
-				SetPosition(m_targetPos);
+				SetGlobalPos(m_targetPos);
 				m_moveStat = 0;
 				m_moveTime = -0.1;
-				m_newPos = m_targetPos;
+				m_newPos = GetPosition();
 				m_isNewPos = true;
 			}
 			else {
-				SetPosition(position + vec * moveDis / dis);
+				SetGlobalPos(position + vec * moveDis / dis);
 			}
 		}
 	}
 
+	//tmp2018.11.4
+
 	// Position the cube.
-	const XMMATRIX modelTranslation = XMMatrixTranslationFromVector(XMLoadFloat3(&GetPosition()));
+	const XMMATRIX modelTranslation = XMMatrixTranslationFromVector(XMLoadFloat3(&GetGlobalPos()));
 
 	// Multiply to get the transform matrix.
 	// Note that this transform does not enforce a particular coordinate system. The calling
@@ -398,4 +415,58 @@ void SpinningCubeRenderer::ReleaseDeviceDependentResources()
 	m_modelConstantBuffer.Reset();
 	m_vertexBuffer.Reset();
 	m_indexBuffer.Reset();
+}
+
+void SpinningCubeRenderer::CalMyBytes()
+{
+	m_bytes = sizeof(GetPosition());
+}
+
+void SpinningCubeRenderer::UpdateData(const std::vector<char>& data)
+{
+	int byteCount = sizeof(GetType());
+	memcpy_s(&m_modelID, sizeof(m_modelID), data.data() + byteCount, sizeof(m_modelID));
+	byteCount += sizeof(m_modelID);
+	byteCount += sizeof(m_ID);
+	float* ptr = (float*)(data.data() + byteCount);
+
+	Windows::Foundation::Numerics::float3 pos;
+	pos.x = ptr[0];
+	pos.y = ptr[1];
+	pos.z = ptr[2];
+
+	SetPosition(pos);
+}
+
+std::vector<char> SpinningCubeRenderer::GetDataBytes()
+{
+	//m_modelID = m_modelID == 11 ? 12 : 11;
+	int byteCount = 0;
+	int type = GetType();
+	Windows::Foundation::Numerics::float3 pos = GetPosition();
+	int size = sizeof(pos) + sizeof(m_modelID) + sizeof(m_ID) + sizeof(type);
+	std::vector<char> ret(size);
+	memcpy_s(ret.data(), sizeof(type), &type, sizeof(type));
+	byteCount += sizeof(type);
+	memcpy_s(ret.data() + byteCount, sizeof(m_modelID), &m_modelID, sizeof(m_modelID));
+	byteCount += sizeof(m_modelID);
+	byteCount += sizeof(m_ID);
+	memcpy_s(ret.data() + byteCount, sizeof(pos), &pos, sizeof(pos));
+
+	return ret;
+}
+
+void SpinningCubeRenderer::UpdateBinding(std::shared_ptr<NamedObj> root)
+{
+	if (m_lastModelID == m_modelID)
+		return;
+
+	m_lastModelID = m_modelID;
+	auto model = std::dynamic_pointer_cast<Model>(root->Find(m_modelID));
+
+	if (!model)
+		throw "SpinningCubeRenderer::UpdateBinding : dynamic_pointer_cast result is null.";
+	this->SetModel(model);
+
+	CreateDeviceDependentResources();
 }
